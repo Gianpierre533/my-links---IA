@@ -1,0 +1,695 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gianpierre Vasquez — MyLinks</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #09090d;
+        --card-bg: #13131c;
+        --card-border: rgba(255, 255, 255, 0.07);
+        --text-hi: #eeeef5;
+        --text-mid: #7f7f9a;
+        --text-lo: #4a4a62;
+
+        /* ── Button palette (adapted from existing) ── */
+        --btn-li-from: #44d4f4;
+        --btn-li-to: #4a56f0;
+        --btn-li-glow: rgba(74, 86, 240, 0.45);
+        --btn-li-glow2: rgba(68, 212, 244, 0.25);
+
+        --btn-dc: #6c5ce7;
+        --btn-dc-glow: rgba(108, 92, 231, 0.48);
+
+        --btn-yt: #e5334a;
+        --btn-yt-glow: rgba(229, 51, 74, 0.45);
+
+        --btn-tw-bg: #1e1e2c;
+        --btn-tw-bd: rgba(255, 255, 255, 0.13);
+        --btn-tw-glow: rgba(0, 0, 0, 0.55);
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        font-family: "Outfit", sans-serif;
+        background: var(--bg);
+        color: var(--text-hi);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1.25rem;
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* ── Diagonal line decorations ─────────────────────── */
+      .deco {
+        position: fixed;
+        pointer-events: none;
+      }
+      .deco-tl {
+        top: 4%;
+        left: 2%;
+      }
+      .deco-tr {
+        top: 3%;
+        right: 2%;
+      }
+      .deco-ml {
+        top: 50%;
+        left: 1%;
+        transform: translateY(-50%);
+      }
+      .deco-bl {
+        bottom: 4%;
+        left: 2%;
+      }
+      .deco-br {
+        bottom: 3%;
+        right: 2%;
+      }
+
+      /* ── Card ──────────────────────────────────────────── */
+      .card {
+        position: relative;
+        z-index: 1;
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 28px;
+        width: 100%;
+        max-width: 900px;
+        padding: 2.5rem 2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 2.5rem;
+        box-shadow:
+          0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+          0 32px 80px rgba(0, 0, 0, 0.55),
+          0 8px 24px rgba(0, 0, 0, 0.35);
+      }
+
+      @media (min-width: 640px) {
+        .card {
+          flex-direction: row;
+          align-items: center;
+          padding: 3rem 3.5rem;
+          gap: 3.5rem;
+        }
+      }
+
+      /* ── Profile ───────────────────────────────────────── */
+      .profile {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.18);
+        overflow: hidden;
+        margin-bottom: 1.6rem;
+        background: #22223a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.6rem;
+        font-weight: 500;
+        color: var(--text-mid);
+        letter-spacing: 0.02em;
+        flex-shrink: 0;
+        box-shadow:
+          0 0 0 4px rgba(74, 86, 240, 0.12),
+          0 0 0 8px rgba(74, 86, 240, 0.05);
+      }
+
+      .avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      .profile-tag {
+        font-size: 0.62rem;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        color: var(--text-lo);
+        font-weight: 400;
+        margin-bottom: 0.45rem;
+      }
+
+      .profile-name {
+        font-size: clamp(1.9rem, 4.5vw, 2.8rem);
+        font-weight: 300;
+        letter-spacing: -0.025em;
+        line-height: 1.1;
+        color: var(--text-hi);
+        margin-bottom: 1rem;
+      }
+
+      .profile-bio {
+        font-size: 0.875rem;
+        font-weight: 400;
+        line-height: 1.7;
+        color: var(--text-mid);
+        max-width: 340px;
+      }
+
+      /* ── Links column ──────────────────────────────────── */
+      .links {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        min-width: 0;
+      }
+
+      /* ════════════════════════════════════════════════════
+       BUTTON BASE — sombras + bordes + hover mejorados
+    ════════════════════════════════════════════════════ */
+      .link-btn {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        text-decoration: none;
+        border-radius: 100px;
+        padding: 0.78rem 0.78rem 0.78rem 1.5rem;
+        font-family: "Outfit", sans-serif;
+        font-size: 0.92rem;
+        font-weight: 500;
+        color: #fff;
+        border: 1px solid transparent;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        will-change: transform, box-shadow;
+
+        /* Transición rica: transform + shadow + border + brightness */
+        transition:
+          transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+          box-shadow 0.22s ease,
+          border-color 0.22s ease,
+          filter 0.18s ease;
+      }
+
+      /* Shimmer pseudo-element — sweep on hover */
+      .link-btn::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: linear-gradient(
+          105deg,
+          transparent 20%,
+          rgba(255, 255, 255, 0.12) 50%,
+          transparent 80%
+        );
+        transform: translateX(-110%);
+        transition: transform 0.5s ease;
+        pointer-events: none;
+      }
+
+      .link-btn:hover::before {
+        transform: translateX(110%);
+      }
+
+      /* Highlight top-edge inner glow */
+      .link-btn::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 12%;
+        right: 12%;
+        height: 1px;
+        border-radius: 100px;
+        background: rgba(255, 255, 255, 0.28);
+        pointer-events: none;
+        transition: opacity 0.22s ease;
+      }
+
+      .link-btn:hover {
+        filter: brightness(1.1);
+        transform: translateY(-3px) scale(1.015);
+      }
+      .link-btn:active {
+        transform: translateY(0) scale(0.975);
+        filter: brightness(0.95);
+      }
+
+      /* Icon bubble */
+      .btn-label {
+        flex: 1;
+      }
+
+      .btn-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.25);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        margin-left: 0.9rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition:
+          background 0.2s ease,
+          transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+
+      .link-btn:hover .btn-icon {
+        background: rgba(0, 0, 0, 0.38);
+        transform: scale(1.1) rotate(-6deg);
+      }
+
+      .btn-icon svg {
+        width: 16px;
+        height: 16px;
+        fill: currentColor;
+        display: block;
+      }
+
+      /* ── LinkedIn ── */
+      .btn-linkedin {
+        background: linear-gradient(
+          90deg,
+          var(--btn-li-from) 0%,
+          var(--btn-li-to) 100%
+        );
+        border-color: rgba(68, 212, 244, 0.3);
+        box-shadow:
+          0 4px 18px var(--btn-li-glow),
+          0 1px 6px var(--btn-li-glow2),
+          inset 0 1px 0 rgba(255, 255, 255, 0.18);
+      }
+      .btn-linkedin:hover {
+        box-shadow:
+          0 8px 30px var(--btn-li-glow),
+          0 2px 10px var(--btn-li-glow2),
+          inset 0 1px 0 rgba(255, 255, 255, 0.22);
+        border-color: rgba(68, 212, 244, 0.55);
+      }
+
+      /* ── Discord ── */
+      .btn-discord {
+        background: var(--btn-dc);
+        border-color: rgba(108, 92, 231, 0.4);
+        box-shadow:
+          0 4px 18px var(--btn-dc-glow),
+          inset 0 1px 0 rgba(255, 255, 255, 0.16);
+      }
+      .btn-discord:hover {
+        box-shadow:
+          0 8px 30px var(--btn-dc-glow),
+          inset 0 1px 0 rgba(255, 255, 255, 0.22);
+        border-color: rgba(140, 124, 255, 0.6);
+      }
+
+      /* ── YouTube ── */
+      .btn-youtube {
+        background: var(--btn-yt);
+        border-color: rgba(229, 51, 74, 0.4);
+        box-shadow:
+          0 4px 18px var(--btn-yt-glow),
+          inset 0 1px 0 rgba(255, 255, 255, 0.16);
+      }
+      .btn-youtube:hover {
+        box-shadow:
+          0 8px 30px var(--btn-yt-glow),
+          inset 0 1px 0 rgba(255, 255, 255, 0.22);
+        border-color: rgba(255, 80, 100, 0.6);
+      }
+
+      /* ── X / Twitter ── */
+      .btn-twitter {
+        background: var(--btn-tw-bg);
+        border-color: var(--btn-tw-bd);
+        color: var(--text-hi);
+        box-shadow:
+          0 4px 16px var(--btn-tw-glow),
+          inset 0 1px 0 rgba(255, 255, 255, 0.07);
+      }
+      .btn-twitter:hover {
+        box-shadow:
+          0 8px 28px rgba(0, 0, 0, 0.7),
+          0 0 0 1px rgba(255, 255, 255, 0.18),
+          inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.28);
+      }
+      .btn-twitter .btn-icon {
+        background: rgba(255, 255, 255, 0.06);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ── Background decorations ── -->
+    <!-- Top-left cluster -->
+    <svg
+      class="deco deco-tl"
+      width="90"
+      height="90"
+      viewBox="0 0 90 90"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <line
+        x1="8"
+        y1="0"
+        x2="0"
+        y2="8"
+        stroke="white"
+        stroke-opacity=".09"
+        stroke-width="2"
+      />
+      <line
+        x1="20"
+        y1="0"
+        x2="0"
+        y2="20"
+        stroke="white"
+        stroke-opacity=".09"
+        stroke-width="2"
+      />
+      <line
+        x1="32"
+        y1="0"
+        x2="0"
+        y2="32"
+        stroke="white"
+        stroke-opacity=".09"
+        stroke-width="2"
+      />
+      <line
+        x1="44"
+        y1="0"
+        x2="0"
+        y2="44"
+        stroke="white"
+        stroke-opacity=".06"
+        stroke-width="2"
+      />
+      <line
+        x1="18"
+        y1="20"
+        x2="20"
+        y2="18"
+        stroke="white"
+        stroke-opacity=".05"
+        stroke-width="1.5"
+      />
+    </svg>
+
+    <!-- Top-right cluster -->
+    <svg
+      class="deco deco-tr"
+      width="160"
+      height="120"
+      viewBox="0 0 160 120"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <line
+        x1="160"
+        y1="8"
+        x2="152"
+        y2="0"
+        stroke="white"
+        stroke-opacity=".09"
+        stroke-width="2"
+      />
+      <line
+        x1="160"
+        y1="24"
+        x2="136"
+        y2="0"
+        stroke="white"
+        stroke-opacity=".09"
+        stroke-width="2"
+      />
+      <line
+        x1="160"
+        y1="40"
+        x2="120"
+        y2="0"
+        stroke="white"
+        stroke-opacity=".09"
+        stroke-width="2"
+      />
+      <line
+        x1="160"
+        y1="56"
+        x2="104"
+        y2="0"
+        stroke="white"
+        stroke-opacity=".07"
+        stroke-width="2"
+      />
+      <line
+        x1="160"
+        y1="72"
+        x2="88"
+        y2="0"
+        stroke="white"
+        stroke-opacity=".05"
+        stroke-width="2"
+      />
+      <line
+        x1="90"
+        y1="50"
+        x2="110"
+        y2="30"
+        stroke="white"
+        stroke-opacity=".04"
+        stroke-width="1.5"
+      />
+      <line
+        x1="100"
+        y1="70"
+        x2="130"
+        y2="40"
+        stroke="white"
+        stroke-opacity=".04"
+        stroke-width="1.5"
+      />
+    </svg>
+
+    <!-- Mid-left cluster -->
+    <svg
+      class="deco deco-ml"
+      width="60"
+      height="80"
+      viewBox="0 0 60 80"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <line
+        x1="0"
+        y1="20"
+        x2="20"
+        y2="0"
+        stroke="white"
+        stroke-opacity=".07"
+        stroke-width="1.5"
+      />
+      <line
+        x1="0"
+        y1="35"
+        x2="35"
+        y2="0"
+        stroke="white"
+        stroke-opacity=".06"
+        stroke-width="1.5"
+      />
+      <line
+        x1="0"
+        y1="50"
+        x2="50"
+        y2="0"
+        stroke="white"
+        stroke-opacity=".05"
+        stroke-width="1.5"
+      />
+    </svg>
+
+    <!-- Bottom-left cluster -->
+    <svg
+      class="deco deco-bl"
+      width="90"
+      height="90"
+      viewBox="0 0 90 90"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <line
+        x1="0"
+        y1="82"
+        x2="82"
+        y2="0"
+        stroke="white"
+        stroke-opacity=".08"
+        stroke-width="2"
+      />
+      <line
+        x1="0"
+        y1="66"
+        x2="66"
+        y2="0"
+        stroke="white"
+        stroke-opacity=".07"
+        stroke-width="2"
+      />
+      <line
+        x1="0"
+        y1="50"
+        x2="50"
+        y2="0"
+        stroke="white"
+        stroke-opacity=".06"
+        stroke-width="2"
+      />
+      <line
+        x1="0"
+        y1="34"
+        x2="34"
+        y2="0"
+        stroke="white"
+        stroke-opacity=".05"
+        stroke-width="2"
+      />
+    </svg>
+
+    <!-- Bottom-right cluster -->
+    <svg
+      class="deco deco-br"
+      width="100"
+      height="100"
+      viewBox="0 0 100 100"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <line
+        x1="100"
+        y1="82"
+        x2="18"
+        y2="0"
+        stroke="white"
+        stroke-opacity=".08"
+        stroke-width="2"
+      />
+      <line
+        x1="100"
+        y1="66"
+        x2="34"
+        y2="0"
+        stroke="white"
+        stroke-opacity=".07"
+        stroke-width="2"
+      />
+      <line
+        x1="100"
+        y1="50"
+        x2="50"
+        y2="0"
+        stroke="white"
+        stroke-opacity=".06"
+        stroke-width="2"
+      />
+      <line
+        x1="100"
+        y1="34"
+        x2="66"
+        y2="0"
+        stroke="white"
+        stroke-opacity=".05"
+        stroke-width="2"
+      />
+    </svg>
+
+    <!-- ── Card ── -->
+    <div class="card">
+      <!-- Profile section -->
+      <div class="profile">
+        <div class="avatar">GV</div>
+        <p class="profile-tag">Ingeniería de Sistemas</p>
+        <h1 class="profile-name">Gianpierre Vasquez</h1>
+        <p class="profile-bio">
+          Soy estudiante de Ingeniería de Sistemas, apasionado por el desarrollo
+          de software y la tecnología. Siempre aprendiendo, siempre
+          construyendo.
+        </p>
+      </div>
+
+      <!-- Links section -->
+      <nav class="links" aria-label="Redes sociales">
+        <a
+          href="#"
+          class="link-btn btn-linkedin"
+          target="_blank"
+          rel="noopener"
+        >
+          <span class="btn-label">LinkedIn</span>
+          <span class="btn-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.063 2.063 0 1 1 0-4.126 2.063 2.063 0 0 1 0 4.126zM7.119 20.452H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
+              />
+            </svg>
+          </span>
+        </a>
+
+        <a href="#" class="link-btn btn-discord" target="_blank" rel="noopener">
+          <span class="btn-label">Discord</span>
+          <span class="btn-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.013.043.03.057a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"
+              />
+            </svg>
+          </span>
+        </a>
+
+        <a href="#" class="link-btn btn-youtube" target="_blank" rel="noopener">
+          <span class="btn-label">YouTube</span>
+          <span class="btn-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"
+              />
+            </svg>
+          </span>
+        </a>
+
+        <a href="#" class="link-btn btn-twitter" target="_blank" rel="noopener">
+          <span class="btn-label">X (Twitter)</span>
+          <span class="btn-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
+              />
+            </svg>
+          </span>
+        </a>
+      </nav>
+    </div>
+  </body>
+</html>
